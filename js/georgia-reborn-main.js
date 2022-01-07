@@ -437,18 +437,36 @@ function draw_ui(gr) {
 	}
 	if (fb.IsPlaying && (albumart || !cdart || !albumart && cdart) && ((!displayLibrary && !displayPlaylist) || !settings.hidePanelBgWhenCollapsed)) {
 		gr.SetSmoothingMode(SmoothingMode.None);
-		gr.FillSolidRect(0, albumart_size.y, albumart_size.x, albumart_size.h, pref.layout_mode === 'artwork_mode' ? g_pl_colors.background : col.primary); // info background -- must be drawn after shadow
+		gr.FillSolidRect(0, albumart_size.y, albumart_size.x, albumart_size.h, pref.layout_mode === 'artwork_mode' ? g_pl_colors.background : pref.whiteTheme || pref.blackTheme || pref.rebornTheme ? col.primary : g_pl_colors.background); // info background -- must be drawn after shadow
 
-		if (!cdart) {
+		if (!cdart || !pref.display_cdart) {
 			if (pref.no_cdartBG) {
 				if (albumart) {
-					gr.FillSolidRect(ww - albumart_size.x - (pref.layout_mode === 'artwork_mode' ? 0 : 1), albumart_size.y, albumart_size.x + (pref.layout_mode === 'artwork_mode' ? 0 : 1), albumart_size.h, pref.layout_mode === 'artwork_mode' ? g_pl_colors.background : col.primary);
+					gr.FillSolidRect(ww - albumart_size.x - (pref.layout_mode === 'artwork_mode' ? 0 : 1), albumart_size.y, albumart_size.x + (pref.layout_mode === 'artwork_mode' ? 0 : 1), albumart_size.h, pref.layout_mode === 'artwork_mode' ? g_pl_colors.background : pref.whiteTheme || pref.blackTheme || pref.rebornTheme ? col.primary : g_pl_colors.background);
+					// Info background right top shadow
+					gr.FillGradRect(ww - albumart_size.x - 1, geo.top_art_spacing - (is_4k ? 10 : 6), ww, is_4k ? 10 : 6, 90, RGBtoRGBA(col.shadow, 0),
+						pref.whiteTheme ? RGBtoRGBA(col.shadow, 30) :
+						pref.blackTheme ? RGBtoRGBA(col.shadow, 80) :
+						pref.rebornTheme ? RGBtoRGBA(col.shadow, 40) :
+						pref.blueTheme ? RGBtoRGBA(col.shadow, 26) :
+						pref.darkblueTheme ? RGBtoRGBA(col.shadow, 72) :
+						pref.redTheme ? RGBtoRGBA(col.shadow, 72) :
+						pref.creamTheme ? RGBtoRGBA(col.shadow, 24) :
+						pref.nblueTheme || pref.ngreenTheme || pref.nredTheme || pref.ngoldTheme ? RGBtoRGBA(col.shadow, 120) : ''
+					);
+					// Info background right bottom shadow
+					gr.FillGradRect(ww - albumart_size.x - 1, wh - geo.lower_bar_h - (is_4k ? -1 : 1), ww, scaleForDisplay(5), 90,
+						pref.whiteTheme ? RGBtoRGBA(col.shadow, 18) :
+						pref.blackTheme ? RGBtoRGBA(col.shadow, 80) :
+						pref.rebornTheme ? RGBtoRGBA(col.shadow, 30) :
+						pref.blueTheme ? RGBtoRGBA(col.shadow, 26) :
+						pref.darkblueTheme ? RGBtoRGBA(col.shadow, 72) :
+						pref.redTheme ? RGBtoRGBA(col.shadow, 72) :
+						pref.creamTheme ? RGBtoRGBA(col.shadow, 18) :
+						pref.nblueTheme || pref.ngreenTheme || pref.nredTheme || pref.ngoldTheme ? RGBtoRGBA(col.shadow, 120) : '',
+						RGBtoRGBA(col.shadow, 0)
+					);
 				}
-			}
-		}
-		if (!pref.display_cdart) {
-			if (albumart) {
-				gr.FillSolidRect(ww - albumart_size.x - (pref.layout_mode === 'artwork_mode' ? 0 : 1), albumart_size.y, albumart_size.x + (pref.layout_mode === 'artwork_mode' ? 0 : 1), albumart_size.h, pref.layout_mode === 'artwork_mode' ? g_pl_colors.background : col.primary);
 			}
 		}
 
@@ -458,20 +476,7 @@ function draw_ui(gr) {
 			// Info background bottom shadow
 			gr.FillGradRect(0, wh - geo.lower_bar_h - (is_4k ? -1 : 1), displayLibrary ? ww / 2 : ww, scaleForDisplay(5), 90, RGBtoRGBA(col.shadow, 18), RGBtoRGBA(col.shadow, 0));
 		}
-		if (pref.layout_mode === 'artwork_mode' && !displayBiography) {
-			if (pref.whiteTheme) {
-				// Info background top shadow
-				gr.FillGradRect(0, geo.top_art_spacing  - (is_4k ? 10 : 6), displayLibrary ? ww / 2 : ww, is_4k ? 10 : 6, 90, RGBtoRGBA(col.shadow, 0), RGBtoRGBA(col.shadow, 24));
-				// Info background bottom shadow
-				gr.FillGradRect(0, wh - geo.lower_bar_h - (is_4k ? -1 : 1), displayLibrary ? ww / 2 : ww, scaleForDisplay(5), 90, RGBtoRGBA(col.shadow, 18), RGBtoRGBA(col.shadow, 0));
-			} else {
-				// Info background top shadow
-				gr.FillGradRect(0, geo.top_art_spacing - (is_4k ? 10 : 6), ww, is_4k ? 10 : 6, 90, RGBtoRGBA(col.shadow, 0), RGBtoRGBA(col.shadow, 40));
-				// Info background bottom shadow
-				gr.FillGradRect(0, wh - geo.lower_bar_h - (is_4k ? -1 : 1), ww, scaleForDisplay(5), 90, RGBtoRGBA(col.shadow, 30), RGBtoRGBA(col.shadow, 0));
-			}
-		}
-		if ((pref.blackTheme || pref.rebornTheme || pref.blueTheme || pref.darkblueTheme || pref.redTheme || pref.creamTheme || pref.nblueTheme || pref.ngreenTheme || pref.nredTheme || pref.ngoldTheme) && (isStreaming && noArtwork || !albumart && noArtwork) && pref.layout_mode !== 'artwork_mode') {
+		else if ((pref.blackTheme || pref.rebornTheme || pref.blueTheme || pref.darkblueTheme || pref.redTheme || pref.creamTheme || pref.nblueTheme || pref.ngreenTheme || pref.nredTheme || pref.ngoldTheme) && (isStreaming && noArtwork || !albumart && noArtwork) && pref.layout_mode !== 'artwork_mode') {
 			// Info background top shadow
 			gr.FillGradRect(0, albumart_size.y - (pref.nblueTheme || pref.ngreenTheme || pref.nredTheme || pref.ngoldTheme ? (is_4k ? 8 : 6) : (is_4k ? 10 : 6)), displayLibrary ? ww / 2 : ww, is_4k ? 10 : 6, 90, RGBtoRGBA(col.shadow, 0),
 				pref.blackTheme ? RGBtoRGBA(col.shadow, 120) :
@@ -493,6 +498,19 @@ function draw_ui(gr) {
 				pref.nblueTheme || pref.ngreenTheme || pref.nredTheme || pref.ngoldTheme ? RGBtoRGBA(col.shadow, 120) : '',
 				RGBtoRGBA(col.shadow, 0)
 			);
+		}
+		else if (pref.layout_mode === 'artwork_mode' && (!displayPlaylist && !displayBiography || displayPlaylist && !displayBiography && (!albumart || cdart))) {
+			if (pref.whiteTheme) {
+				// Info background top shadow
+				gr.FillGradRect(0, geo.top_art_spacing  - (is_4k ? 10 : 6), displayLibrary ? ww / 2 : ww, is_4k ? 10 : 6, 90, RGBtoRGBA(col.shadow, 0), RGBtoRGBA(col.shadow, 24));
+				// Info background bottom shadow
+				gr.FillGradRect(0, wh - geo.lower_bar_h - (is_4k ? -1 : 1), displayLibrary ? ww / 2 : ww, scaleForDisplay(5), 90, RGBtoRGBA(col.shadow, 18), RGBtoRGBA(col.shadow, 0));
+			} else {
+				// Info background top shadow
+				gr.FillGradRect(0, geo.top_art_spacing - (is_4k ? 10 : 6), ww, is_4k ? 10 : 6, 90, RGBtoRGBA(col.shadow, 0), RGBtoRGBA(col.shadow, 40));
+				// Info background bottom shadow
+				gr.FillGradRect(0, wh - geo.lower_bar_h - (is_4k ? -1 : 1), ww, scaleForDisplay(5), 90, RGBtoRGBA(col.shadow, 30), RGBtoRGBA(col.shadow, 0));
+			}
 		}
 		if ((isStreaming && noArtwork || !albumart && noArtwork)) {
 			gr.FillSolidRect(0, geo.top_art_spacing, ww, wh - geo.top_art_spacing - geo.lower_bar_h, g_pl_colors.background); // Info background -- must be drawn after shadow
@@ -606,6 +624,12 @@ function draw_ui(gr) {
 			col.info_text = rgb(255, 255, 255);
 			if (pref.rebornTheme) col.info_text = !albumart ? rgb(120, 120, 120) : col.maxLightAccent;
 		}
+		if (pref.blueTheme || pref.darkblueTheme || pref.redTheme || pref.nblueTheme || pref.ngreenTheme || pref.nredTheme || pref.ngoldTheme) {
+			col.info_text = rgb(255, 255, 255);
+		}
+		else if (pref.creamTheme) {
+			col.info_text = rgb(120, 120, 120);
+		}
 		if ((pref.layout_mode === 'artwork_mode' && (pref.whiteTheme || pref.creamTheme) || pref.whiteTheme && isStreaming || pref.whiteTheme && !albumart) || pref.creamTheme && isStreaming || pref.creamTheme && !albumart) {
 			col.info_text = rgb(120, 120, 120);
 		}
@@ -650,9 +674,9 @@ function draw_ui(gr) {
 					gr.SetTextRenderingHint(TextRenderingHint.ClearTypeGridFit); // thicker fonts can use anti-alias
 				}
 				if (pref.show_flags_details && flagImgs.length) {
-					gr.DrawString(flagSize + str.artist, ft.artist, col.info_text, textLeft, top, text_width, height, g_string_format.trim_ellipsis_char);
+					gr.DrawString(flagSize + str.artist, ft.artist, pref.whiteTheme || pref.blackTheme || pref.rebornTheme ? col.info_text : pref.creamTheme ? g_pl_colors.artist_normal : g_pl_colors.artist_playing, textLeft, top, text_width, height, g_string_format.trim_ellipsis_char);
 				} else {
-					gr.DrawString(str.artist, ft.artist, col.info_text, textLeft, top, text_width, height, g_string_format.trim_ellipsis_char);
+					gr.DrawString(str.artist, ft.artist, pref.whiteTheme || pref.blackTheme || pref.rebornTheme ? col.info_text : pref.creamTheme ? g_pl_colors.artist_normal : g_pl_colors.artist_playing, textLeft, top, text_width, height, g_string_format.trim_ellipsis_char);
 				}
 
 				gr.SetTextRenderingHint(TextRenderingHint.AntiAliasGridFit);
@@ -1496,6 +1520,7 @@ function onOptionsMenu(x, y) {
 		pref.nredTheme       = false;
 		pref.ngoldTheme      = false;
 		initTheme();
+		timelineColors();
 	});
 	themeMenu.addToggleItem('Black', pref, 'blackTheme', () => {
 		pref.whiteTheme      = false;
@@ -1510,6 +1535,7 @@ function onOptionsMenu(x, y) {
 		pref.nredTheme       = false;
 		pref.ngoldTheme      = false;
 		initTheme();
+		timelineColors();
 	});
 	themeMenu.addToggleItem('Reborn', pref, 'rebornTheme', () => {
 		pref.whiteTheme      = false;
@@ -1524,6 +1550,7 @@ function onOptionsMenu(x, y) {
 		pref.nredTheme       = false;
 		pref.ngoldTheme      = false;
 		initTheme();
+		timelineColors();
 	});
 	themeMenu.addSeparator();
 	themeMenu.addToggleItem('Blue', pref, 'blueTheme', () => {
@@ -1539,6 +1566,7 @@ function onOptionsMenu(x, y) {
 		pref.nredTheme       = false;
 		pref.ngoldTheme      = false;
 		initTheme();
+		timelineColors();
 	});
 	themeMenu.addToggleItem('Dark blue', pref, 'darkblueTheme', () => {
 		pref.whiteTheme      = false;
@@ -1553,6 +1581,7 @@ function onOptionsMenu(x, y) {
 		pref.nredTheme       = false;
 		pref.ngoldTheme      = false;
 		initTheme();
+		timelineColors();
 	});
 	themeMenu.addToggleItem('Red', pref, 'redTheme', () => {
 		pref.whiteTheme      = false;
@@ -1567,6 +1596,7 @@ function onOptionsMenu(x, y) {
 		pref.nredTheme       = false;
 		pref.ngoldTheme      = false;
 		initTheme();
+		timelineColors();
 	});
 	themeMenu.addToggleItem('Cream', pref, 'creamTheme', () => {
 		pref.whiteTheme      = false;
@@ -1581,6 +1611,7 @@ function onOptionsMenu(x, y) {
 		pref.nredTheme       = false;
 		pref.ngoldTheme      = false;
 		initTheme();
+		timelineColors();
 	});
 	themeMenu.addSeparator();
 	themeMenu.addToggleItem('Neon blue', pref, 'nblueTheme', () => {
@@ -1596,6 +1627,7 @@ function onOptionsMenu(x, y) {
 		pref.nredTheme       = false;
 		pref.ngoldTheme      = false;
 		initTheme();
+		timelineColors();
 	});
 	themeMenu.addToggleItem('Neon green', pref, 'ngreenTheme', () => {
 		pref.whiteTheme      = false;
@@ -1610,6 +1642,7 @@ function onOptionsMenu(x, y) {
 		pref.nredTheme       = false;
 		pref.ngoldTheme      = false;
 		initTheme();
+		timelineColors();
 	});
 	themeMenu.addToggleItem('Neon red', pref, 'nredTheme', () => {
 		pref.whiteTheme      = false;
@@ -1624,6 +1657,7 @@ function onOptionsMenu(x, y) {
 		pref.nredTheme       = 'nred';
 		pref.ngoldTheme      = false;
 		initTheme();
+		timelineColors();
 	});
 	themeMenu.addToggleItem('Neon gold', pref, 'ngoldTheme', () => {
 		pref.whiteTheme      = false;
@@ -1638,6 +1672,7 @@ function onOptionsMenu(x, y) {
 		pref.nredTheme       = false;
 		pref.ngoldTheme      = 'ngold';
 		initTheme();
+		timelineColors();
 	});
 	themeMenu.appendTo(menu);
 
@@ -2001,6 +2036,95 @@ function onOptionsMenu(x, y) {
 
 	const playerControlsMenu = new Menu('Player controls');
 
+	const playerControlsScrollbarMenu = new Menu('Scrollbar settings');
+	const playerControlsScrollbarPlaylistMenu = new Menu('Playlist');
+	const playerControlsScrollbarPlaylistStepsMenu = new Menu('Mouse wheel scroll steps');
+	playerControlsScrollbarPlaylistStepsMenu.addRadioItems(['1 Step', '2 Steps', '3 Steps (default)', '4 Steps', '5 Steps', '6 Steps', '7 Steps', '8 Steps', '9 Steps', '10 Steps'], pref.wheelScrollSteps_Playlist, [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9], (steps) => {
+		pref.wheelScrollSteps_Playlist = steps;
+		playlistCallback();
+	});
+	playerControlsScrollbarPlaylistStepsMenu.appendTo(playerControlsScrollbarPlaylistMenu);
+	const playerControlsScrollbarPlaylistDurationMenu = new Menu('Mouse wheel scroll smooth duration');
+	playerControlsScrollbarPlaylistDurationMenu.addRadioItems(['100ms', '200ms', '300ms', '400ms', '500ms (default)', '600ms', '700ms', '800ms', '900ms', '1000ms'], pref.wheelScrollDuration_Playlist, [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], (duration) => {
+		pref.wheelScrollDuration_Playlist = duration;
+		playlistCallback();
+	});
+	playerControlsScrollbarPlaylistDurationMenu.appendTo(playerControlsScrollbarPlaylistMenu);
+	playerControlsScrollbarPlaylistMenu.addSeparator();
+	playerControlsScrollbarPlaylistMenu.addToggleItem('Auto-hide', pref, 'autoHideScrollbar_Playlist',  () => {
+		if (pref.autoHideScrollbar_Playlist) {
+			g_properties.show_scrollbar = false;
+			playlistCallback();
+		} else {
+			g_properties.show_scrollbar = true;
+			playlistCallback();
+		}
+	});
+	playerControlsScrollbarPlaylistMenu.addToggleItem('Smooth scroll', pref, 'smoothScrolling');
+	playerControlsScrollbarPlaylistMenu.appendTo(playerControlsScrollbarMenu);
+
+	const playerControlsScrollbarLibraryMenu = new Menu('Library');
+	const playerControlsScrollbarLibraryStepsMenu = new Menu('Mouse wheel scroll steps');
+	playerControlsScrollbarLibraryStepsMenu.addRadioItems(['1 Step', '2 Steps', '3 Steps (default)', '4 Steps', '5 Steps', '6 Steps', '7 Steps', '8 Steps', '9 Steps', '10 Steps'], ppt.scrollStep, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], (steps) => {
+		ppt.scrollStep = steps;
+		panel.updateProp(1);
+	});
+	playerControlsScrollbarLibraryStepsMenu.appendTo(playerControlsScrollbarLibraryMenu);
+	const playerControlsScrollbarLibraryDurationMenu = new Menu('Mouse wheel scroll smooth duration');
+	playerControlsScrollbarLibraryDurationMenu.addRadioItems(['100ms', '200ms', '300ms', '400ms', '500ms (default)', '600ms', '700ms', '800ms', '900ms', '1000ms'], ppt.durationScroll, [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], (duration) => {
+		ppt.durationScroll = duration;
+		panel.updateProp(1);
+	});
+	playerControlsScrollbarLibraryDurationMenu.appendTo(playerControlsScrollbarLibraryMenu);
+	playerControlsScrollbarLibraryMenu.addSeparator();
+	playerControlsScrollbarLibraryMenu.addToggleItem('Auto-hide', pref, 'autoHideScrollbar_Library', () => {
+		if (pref.autoHideScrollbar_Library) {
+			g_properties.show_scrollbar = false;
+			ppt.sbarShow = 1;
+			setLibrarySize();
+		} else {
+			g_properties.show_scrollbar = true;
+			ppt.sbarShow = 2;
+			setLibrarySize();
+		}
+	});
+	playerControlsScrollbarLibraryMenu.addToggleItem('Smooth scroll', ppt, 'smooth');
+	playerControlsScrollbarLibraryMenu.appendTo(playerControlsScrollbarMenu);
+
+	const playerControlsBiographyMenu = new Menu('Biography');
+	const playerControlsScrollbarBiographyStepsMenu = new Menu('Mouse wheel scroll steps');
+	playerControlsScrollbarBiographyStepsMenu.addRadioItems(['1 Step', '2 Steps', '3 Steps (default)', '4 Steps', '5 Steps', '6 Steps', '7 Steps', '8 Steps', '9 Steps', '10 Steps'], pptBio.scrollStep, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], (steps) => {
+		pptBio.scrollStep = steps;
+		uiBio.updateProp(1);
+	});
+	playerControlsScrollbarBiographyStepsMenu.appendTo(playerControlsBiographyMenu);
+	const playerControlsScrollbarBiographyDurationMenu = new Menu('Mouse wheel scroll smooth duration');
+	playerControlsScrollbarBiographyDurationMenu.addRadioItems(['100ms', '200ms', '300ms', '400ms', '500ms (default)', '600ms', '700ms', '800ms', '900ms', '1000ms'], pptBio.durationScroll, [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], (duration) => {
+		pptBio.durationScroll = duration;
+		uiBio.updateProp(1);
+	});
+	playerControlsScrollbarBiographyDurationMenu.appendTo(playerControlsBiographyMenu);
+	playerControlsBiographyMenu.addToggleItem('Auto-hide', pref, 'autoHideScrollbar_Biography', () => {
+		if (pref.autoHideScrollbar_Biography) {
+			pptBio.sbarShow = 1;
+			butBio.set_src_btn_hide();
+			butBio.set_scroll_btns_hide();
+			window.Repaint();
+		} else {
+			pptBio.sbarShow = 2;
+			art_scrollbar.narrow = false;
+			alb_scrollbar.narrow = false;
+			butBio.set_scroll_btns_hide(false);
+			art_scrollbar.resetAuto();
+			alb_scrollbar.resetAuto();
+			window.Repaint();
+		}
+	});
+	playerControlsBiographyMenu.addToggleItem('Smooth scroll', ppt, 'smooth');
+	playerControlsBiographyMenu.appendTo(playerControlsScrollbarMenu);
+
+	playerControlsScrollbarMenu.appendTo(playerControlsMenu);
+
 	const transportSizeMenu = new Menu('Transport button size');
 	const transportSizeMenuDefault = new Menu('Default');
 	transportSizeMenuDefault.addRadioItems(['24px', '26px', '28px', '32px (default)', '34px', '36px', '38px'], pref.transport_buttons_size_default, [24,26,28,32,34,36,38], (size) => {
@@ -2287,19 +2411,6 @@ function onOptionsMenu(x, y) {
 		playlist.on_size(ww, wh);
 		window.Repaint();
 	};
-
-	const playlistScrollBarMenu = new Menu('Scrollbar');
-	playlistScrollBarMenu.addToggleItem('Auto-hide', pref, 'autoHideScrollbar_Playlist',  () => {
-		if (pref.autoHideScrollbar_Playlist) {
-			g_properties.show_scrollbar = false;
-			playlistCallback();
-		} else {
-			g_properties.show_scrollbar = true;
-			playlistCallback();
-		}
-	});
-	playlistScrollBarMenu.addToggleItem('Smooth scroll', pref, 'smoothScrolling');
-	playlistScrollBarMenu.appendTo(playlistMenu);
 
 	const playlistManagerMenu = new Menu('Playlist manager');
 	playlistManagerMenu.addToggleItem('Auto-hide', pref, 'autoHidePLM',  () => {
@@ -2780,21 +2891,6 @@ function onOptionsMenu(x, y) {
 	libraryLabelsMenu.addSeparator();
 	libraryLabelsMenu.addToggleItem('Flip', ppt, 'albumArtFlipLabels', () => {  panel.updateProp(1); });
 	libraryLabelsMenu.appendTo(libraryAlbumArtMenu);
-
-	const libraryScrollBarMenu = new Menu('Scrollbar');
-	libraryScrollBarMenu.addToggleItem('Auto-hide', pref, 'autoHideScrollbar_Library', () => {
-		if (pref.autoHideScrollbar_Library) {
-			g_properties.show_scrollbar = false;
-			ppt.sbarShow = 1;
-			setLibrarySize();
-		} else {
-			g_properties.show_scrollbar = true;
-			ppt.sbarShow = 2;
-			setLibrarySize();
-		}
-	});
-	libraryScrollBarMenu.addToggleItem('Smooth scroll', ppt, 'smooth');
-	libraryScrollBarMenu.appendTo(libraryMenu);
 	libraryMenu.addSeparator();
 
 	libraryMenu.createRadioSubMenu('Node root type', ['Hide', 'All Music', 'View name', 'Summary item'], ppt.rootNode, [0,1,2,3], function (nodeIndex) {
@@ -3021,27 +3117,6 @@ function onOptionsMenu(x, y) {
 	biographyCoverSrcMenu.appendTo(biographySourcesMenu);
 
 	biographySourcesMenu.appendTo(biographyMenu);
-
-	const biographyScrollBarMenu = new Menu('Scrollbar');
-	biographyScrollBarMenu.addToggleItem('Auto-hide', pref, 'autoHideScrollbar_Biography', () => {
-		if (pref.autoHideScrollbar_Biography) {
-			pptBio.sbarShow = 1;
-			butBio.set_src_btn_hide();
-			butBio.set_scroll_btns_hide();
-			window.Repaint();
-		} else {
-			pptBio.sbarShow = 2;
-			art_scrollbar.narrow = false;
-			alb_scrollbar.narrow = false;
-			butBio.set_scroll_btns_hide(false);
-			art_scrollbar.resetAuto();
-			alb_scrollbar.resetAuto();
-			window.Repaint();
-		}
-	});
-	biographyScrollBarMenu.addToggleItem('Smooth scroll', ppt, 'smooth');
-	biographyScrollBarMenu.appendTo(biographyMenu);
-
 	biographyMenu.appendTo(menu);
 
 	// Lyrics panel options
@@ -3150,6 +3225,7 @@ function initTheme() {
 		createButtonImages();
 		createButtonObjects(ww, wh);
 		playlist.on_size(ww, wh); // Needed to update playlist scrollbar colors -> calling on_size(); from Control_List
+		window.Repaint(); // Needed additional repaint when changing back to Reborn theme
 	}
 
 	initButtonState();
@@ -3771,6 +3847,25 @@ function on_mouse_lbtn_down(x, y, m) {
 			trace_call && console.log(qwr_utils.function_name());
 			biography.on_mouse_lbtn_down(x, y, m);
 		}
+
+		if (albumart && !displayBiography && (pref.layout_mode === 'default_mode' || !displayPlaylistArtworkMode && !displayLibrary && pref.layout_mode === 'artwork_mode')) {
+			if ((albumart_size.x <= x && albumart_size.y <= y && albumart_size.x + albumart_size.w >= x && albumart_size.y + albumart_size.h >= y) ||
+				(cdart && !albumart && cdart_size.x <= x && cdart_size.y <= y && cdart_size.x + cdart_size.w >= x && cdart_size.y + cdart_size.h >= y) || pauseBtn.mouseInThis(x, y)) {
+				// Do not pause when library is in flow mode or library layout is in full width
+				if (!(ppt.albumArtShow && pref.libraryLayout === 'full_width' && displayLibrary || pref.libraryDesign === 'flowMode' && pref.libraryLayout === 'full_width' && displayLibrary || pref.libraryDesign === 'albumCovers' && pref.libraryLayout === 'full_width' && displayLibrary)) {
+					fb.PlayOrPause();
+				}
+			}
+		}
+		else if (!albumart && !displayBiography && (pref.layout_mode === 'default_mode' || !displayPlaylistArtworkMode && !displayLibrary && pref.layout_mode === 'artwork_mode')) {
+			if (state.mouse_x > 0 && state.mouse_x <= (displayPlaylist || displayLibrary ? ww / 2 : !displayPlaylist || !displayLibrary ? ww :  ww / 2) &&
+				state.mouse_y > albumart_size.y && state.mouse_y <= albumart_size.h + geo.top_art_spacing || pauseBtn.mouseInThis(x, y)) {
+				// Do not pause when library is in flow mode or library layout is in full width
+				if (!(ppt.albumArtShow && pref.libraryLayout === 'full_width' && displayLibrary || pref.libraryDesign === 'flowMode' && pref.libraryLayout === 'full_width' && displayLibrary || pref.libraryDesign === 'albumCovers' && pref.libraryLayout === 'full_width' && displayLibrary)) {
+					fb.PlayOrPause();
+				}
+			}
+		}
 	}
 }
 
@@ -3798,26 +3893,6 @@ function on_mouse_lbtn_up(x, y, m) {
 		if (just_dblclicked) {
 			// You just did a double-click, so do nothing
 			just_dblclicked = false;
-		}
-		/** Workaround when using maximize ( double click on top menu ) by adding additional condition UIHacks.MainWindowState == WindowState.Normal otherwise registered
-			on_mouse_lbtn_up click will be in Y-hitarea causing unnecessary pause when maximized/enlarged. In maximized state pauseBtn.mouseInThis area is much bigger */
-		if (albumart && !displayBiography && (pref.layout_mode === 'default_mode' || !displayPlaylistArtworkMode && !displayLibrary && pref.layout_mode === 'artwork_mode') && (UIHacks.MainWindowState == WindowState.Normal || pauseBtn.mouseInThis(x, y))) {
-			if ((albumart_size.x <= x && albumart_size.y <= y && albumart_size.x + albumart_size.w >= x && albumart_size.y + albumart_size.h >= y) ||
-				(cdart && !albumart && cdart_size.x <= x && cdart_size.y <= y && cdart_size.x + cdart_size.w >= x && cdart_size.y + cdart_size.h >= y) || pauseBtn.mouseInThis(x, y)) {
-				// Do not pause when library is in flow mode or library layout is in full width
-				if (!(ppt.albumArtShow && pref.libraryLayout === 'full_width' && displayLibrary || pref.libraryDesign === 'flowMode' && pref.libraryLayout === 'full_width' && displayLibrary || pref.libraryDesign === 'albumCovers' && pref.libraryLayout === 'full_width' && displayLibrary)) {
-					fb.PlayOrPause();
-				}
-			}
-		}
-		else if (!albumart && !displayBiography && (pref.layout_mode === 'default_mode' || !displayPlaylistArtworkMode && !displayLibrary && pref.layout_mode === 'artwork_mode') && (UIHacks.MainWindowState == WindowState.Normal || pauseBtn.mouseInThis(x, y))) {
-			if (state.mouse_x > 0 && state.mouse_x <= (displayPlaylist || displayLibrary ? ww / 2 : !displayPlaylist || !displayLibrary ? ww :  ww / 2) &&
-				state.mouse_y > albumart_size.y && state.mouse_y <= albumart_size.h + geo.top_art_spacing || pauseBtn.mouseInThis(x, y)) {
-				// Do not pause when library is in flow mode or library layout is in full width
-				if (!(ppt.albumArtShow && pref.libraryLayout === 'full_width' && displayLibrary || pref.libraryDesign === 'flowMode' && pref.libraryLayout === 'full_width' && displayLibrary || pref.libraryDesign === 'albumCovers' && pref.libraryLayout === 'full_width' && displayLibrary)) {
-					fb.PlayOrPause();
-				}
-			}
 		}
 		on_mouse_move(x, y);
 		buttonEventHandler(x, y, m);

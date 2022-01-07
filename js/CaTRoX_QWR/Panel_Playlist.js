@@ -41,7 +41,7 @@ g_properties.add_properties(
 		use_rating_from_tags: ['user.row.rating.from_tags', false],
 		show_queue_position:  ['user.row.queue_position.show', true],
 
-		auto_colapse:                ['user.header.collapse.auto', g_is_mini_panel],
+		auto_collapse:               ['user.header.collapse.auto', g_is_mini_panel],
 		collapse_on_playlist_switch: ['user.header.collapse.on_playlist_switch', false],
 		collapse_on_start:           ['user.header.collapse.on_start', false],
 
@@ -178,9 +178,9 @@ function PlaylistPanel(x, y) {
 		// Hide rows that shouldn't be visible
 		gr.SetSmoothingMode(SmoothingMode.None);
 		gr.FillSolidRect(this.x, 0, this.w, geo.top_art_spacing, col.bg); // Hides top row that shouldn't be visible
-		gr.FillSolidRect(this.x, pref.layout_mode === 'artwork_mode' || pref.layout_mode === 'compact_mode' ? this.y - 20 : this.y, this.w, pref.layout_mode === 'artwork_mode' || pref.layout_mode === 'compact_mode' ? g_properties.row_h + scaleForDisplay(4) : scaleForDisplay(2), g_pl_colors.background); // Hides also Playlist's top shadow
-		gr.FillSolidRect(this.x, this.y + this.h, this.w, g_properties.row_h * 4, col.bg); // Hides also Playlist's bottom shadow
-		gr.FillSolidRect(this.x, this.y + this.h - g_properties.row_h, this.w, g_properties.row_h, g_pl_colors.background); // Hide Playlist bottom row and margin
+		gr.FillSolidRect(this.x, this.y, this.w, pref.layout_mode === 'artwork_mode' || pref.layout_mode === 'compact_mode' ? playlist_geo.row_h + scaleForDisplay(4) : scaleForDisplay(2), g_pl_colors.background); // Hides also Playlist's top shadow
+		gr.FillSolidRect(this.x, this.y + this.h, this.w, playlist_geo.row_h * 4, col.bg); // Hides also Playlist's bottom shadow
+		gr.FillSolidRect(this.x, this.y + this.h - playlist_geo.row_h, this.w, playlist_geo.row_h, g_pl_colors.background); // Hide Playlist bottom row and margin
 
 		if (g_properties.show_playlist_info) {
 			//gr.FillSolidRect(playlist_info.x, playlist_info.y + playlist_info.h, playlist_info.w, 2, g_theme.colors.pss_back);
@@ -225,7 +225,7 @@ function PlaylistPanel(x, y) {
 
 		} else if (pref.layout_mode === 'artwork_mode' || pref.layout_mode === 'compact_mode') {
 			// Playlist's top shadow
-			gr.FillGradRect(this.x, is_4k ? this.y - 30 : this.y - 26, this.w, is_4k ? 10 : 6, 90, RGBtoRGBA(col.shadow, 0),
+			gr.FillGradRect(this.x, is_4k ? this.y - 10 : this.y - 6, this.w, is_4k ? 10 : 6, 90, RGBtoRGBA(col.shadow, 0),
 				pref.whiteTheme ? RGBtoRGBA(col.shadow, 24) :
 				pref.blackTheme ? RGBtoRGBA(col.shadow, 120) :
 				pref.rebornTheme ? RGBtoRGBA(col.shadow, 40) :
@@ -236,7 +236,7 @@ function PlaylistPanel(x, y) {
 				pref.nblueTheme || pref.ngreenTheme || pref.nredTheme || pref.ngoldTheme ? RGBtoRGBA(col.shadow, 255) : ''
 			);
 			// Playlist's bottom shadow
-			gr.FillGradRect(this.x, this.y + this.h, this.w, is_4k ? 10 : 6, 90,
+			gr.FillGradRect(this.x, this.y + this.h - (is_4k ? -1 : 1), this.w, scaleForDisplay(5), 90,
 				pref.whiteTheme ? RGBtoRGBA(col.shadow, 18) :
 				pref.blackTheme ? RGBtoRGBA(col.shadow, 105) :
 				pref.rebornTheme ? RGBtoRGBA(col.shadow, 30) :
@@ -267,8 +267,7 @@ function PlaylistPanel(x, y) {
 			this.y = y;
 
 			playlist_info_h = scaleForDisplay(g_properties.row_h);
-			playlist_info_and_gap_h = playlist_info_h + scaleForDisplay(4);
-			playlist.on_size(playlist_w, playlist_h - (playlist_info_and_gap_h + (playlist_info_h / 2 + scaleForDisplay(1))), x, y + playlist_info_and_gap_h);
+			playlist.on_size(playlist_w, playlist_h - (playlist_info_h * 2), x, y + playlist_info_h + scaleForDisplay(4));
 
 			if (pref.showPLM_default) {
 				playlist_info.set_xywh(x, y, this.w);
@@ -282,7 +281,7 @@ function PlaylistPanel(x, y) {
 
 			rescalePlaylist();
 			var x = 0;
-			var y = geo.top_art_spacing + 20;
+			var y = geo.top_art_spacing;
 			var lowerSpace = calcLowerSpace();
 			var playlist_w = w - x;
 			var playlist_h = Math.max(0, h - lowerSpace - y);
@@ -293,10 +292,10 @@ function PlaylistPanel(x, y) {
 			this.y = y;
 
 			playlist_info_h = scaleForDisplay(g_properties.row_h);
-			playlist.on_size(playlist_w, playlist_h - (playlist_info_h / 2 + scaleForDisplay(5)), x, y + scaleForDisplay(4));
+			playlist.on_size(playlist_w, playlist_h - (playlist_info_h * 2), x, y + playlist_info_h + scaleForDisplay(4));
 
 			if (pref.showPLM_artwork) {
-				playlist_info.set_xywh(x, y - playlist_info_h, this.w);
+				playlist_info.set_xywh(x, y, this.w);
 			} else {
 				playlist_info.set_xywh(x, y, 0); // Hide Playlist manager
 			}
@@ -307,7 +306,7 @@ function PlaylistPanel(x, y) {
 
 			rescalePlaylist();
 			var x = 0;
-			var y = geo.top_art_spacing + 20;
+			var y = geo.top_art_spacing;
 			var lowerSpace = calcLowerSpace();
 			var playlist_w = w - x;
 			var playlist_h = Math.max(0, h - lowerSpace - y);
@@ -318,10 +317,10 @@ function PlaylistPanel(x, y) {
 			this.y = y;
 
 			playlist_info_h = scaleForDisplay(g_properties.row_h);
-			playlist.on_size(playlist_w, playlist_h - (playlist_info_h / 2 + scaleForDisplay(5)), x, y + scaleForDisplay(4));
+			playlist.on_size(playlist_w, playlist_h - (playlist_info_h * 2), x, y + playlist_info_h + scaleForDisplay(4));
 
 			if (pref.showPLM_compact) {
-				playlist_info.set_xywh(x, y - playlist_info_h, this.w);
+				playlist_info.set_xywh(x, y, this.w);
 			} else {
 				playlist_info.set_xywh(x, y, 0); // Hide Playlist manager
 			}
@@ -762,6 +761,10 @@ class Playlist extends List {
 		this.h = h;
 		this.w = w;
 		this.was_on_size_called = true;
+
+		if (g_properties.auto_collapse || g_properties.collapse_on_start) {
+			this.collapse_handler.collapse_all_but_now_playing();
+		}
 
 		if (needs_reinit) {
 			this.reinitialize();
@@ -1386,6 +1389,10 @@ class Playlist extends List {
 		if (plman.ActivePlaylist !== this.cur_playlist_idx) {
 			this.initialize_and_repaint_list();
 		}
+
+		if (this.collapse_handler && (g_properties.auto_collapse || g_properties.collapse_on_start)) {
+			this.collapse_handler.collapse_all_but_now_playing();
+		}
 	}
 
 	on_playlist_switch() {
@@ -1394,6 +1401,10 @@ class Playlist extends List {
 		}
 
 		this.initialize_and_repaint_list();
+
+		if (this.collapse_handler && (g_properties.auto_collapse || g_properties.collapse_on_start)) {
+			this.collapse_handler.collapse_all_but_now_playing();
+		}
 	}
 
 	on_playlist_item_ensure_visible(playlist_idx, playlistItemIndex) {
@@ -1464,12 +1475,9 @@ class Playlist extends List {
 			this.playing_item.is_playing = true;
 			this.playing_item.clear_title_text();
 
-			if (fb.CursorFollowPlayback) {
+			if (this.collapse_handler && (g_properties.auto_collapse || g_properties.collapse_on_start)) {
 				this.selection_handler.clear_selection();
-
-				if (this.collapse_handler && g_properties.auto_colapse) {
-					this.collapse_handler.collapse_all_but_now_playing();
-				}
+				this.collapse_handler.collapse_all_but_now_playing();
 				this.scroll_to_now_playing();
 			}
 		}
@@ -2141,15 +2149,17 @@ class Playlist extends List {
 		ce.append_item(
 			'Auto',
 			() => {
-				g_properties.auto_colapse = !g_properties.auto_colapse;
-				if (g_properties.auto_colapse) {
+				g_properties.auto_collapse = !g_properties.auto_collapse;
+				if (g_properties.auto_collapse) {
 					this.collapse_handler.collapse_all_but_now_playing();
 					if (this.collapse_handler.changed) {
 						this.scroll_to_now_playing_or_focused();
 					}
+				} else {
+					this.collapse_handler.expand_all();
 				}
 			},
-			{is_checked: g_properties.auto_colapse}
+			{is_checked: g_properties.auto_collapse}
 		);
 
 		ce.append_item(
@@ -2420,7 +2430,7 @@ class Playlist extends List {
 			'by date',
 			() => {
 				plman.UndoBackup(this.cur_playlist_idx);
-				plman.SortByFormat(this.cur_playlist_idx, '%date%', has_multiple_selected_items);
+				plman.SortByFormat(this.cur_playlist_idx, '$if3(%original release date%, %originaldate%, %date%) %album% %edition% %codec% %discnumber% %tracknumber%', has_multiple_selected_items);
 			}
 		);
 
@@ -6025,7 +6035,7 @@ function CollapseHandler(cnt_arg) {
 		this.changed = false;
 
 		if (g_properties.collapse_on_playlist_switch) {
-			if (g_properties.auto_colapse) {
+			if (g_properties.auto_collapse) {
 				this.collapse_all_but_now_playing()
 			}
 			else {

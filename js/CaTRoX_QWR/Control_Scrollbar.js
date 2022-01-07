@@ -101,12 +101,12 @@ function ScrollBar(x, y, w, h, row_h, fn_redraw) {
         } else {
             var newScroll = this.nearestScroll(direction);
             if (!pref.smoothScrolling) {
-                this.scroll_to(newScroll + direction * 2);
+                this.scroll_to(newScroll + direction * pref.wheelScrollSteps_Playlist);
             } else {
                 if (this.desiredScrollPosition === undefined) {
-                    this.desiredScrollPosition = newScroll + direction * 2;
+                    this.desiredScrollPosition = newScroll + direction * pref.wheelScrollSteps_Playlist;
                 } else {
-                    this.desiredScrollPosition += (direction * 2);
+                    this.desiredScrollPosition += (direction * pref.wheelScrollSteps_Playlist);
                 }
                 if (direction === -1 && this.desiredScrollPosition < 0) {
                     this.desiredScrollPosition = 0;
@@ -401,8 +401,6 @@ function ScrollBar(x, y, w, h, row_h, fn_redraw) {
                 (direction === -1 && newVal < newPosition)) {
                 newVal = newPosition;
                 animationProgress = 100;    // clear interval
-            } else if (newPosition <= 0) { // Fix crash for auto-hide scrollbar when removing almost everything in playlist and some tracks in top remain
-                animationProgress = 100;
             }
             newVal = Math.round(newVal * 100)/100;
             // console.log(`${start} + easeOut(${animationProgress}/100) * (${end} - ${start}) = `, newVal)
@@ -414,7 +412,7 @@ function ScrollBar(x, y, w, h, row_h, fn_redraw) {
         }
         smoothScrollTimer = setInterval(() => {
             scrollFunc();
-        }, 40);
+        }, pref.wheelScrollDuration_Playlist);
         scrollFunc();   // want to immediately start scroll
     }
 
