@@ -1,0 +1,7 @@
+**/.idea/**
+**/node_modules/**
+.gitignore.bak
+*.bak
+**/cache/**
+*.iml
+**/library-tree-cache/**
