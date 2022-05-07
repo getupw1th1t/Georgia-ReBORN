@@ -69,7 +69,7 @@ class Hyperlink {
 		if (this.x_offset < 0) {
 			this.x = w + this.x_offset; // add because offset is negative
 		}
-		this.container_w = w;
+		this.container_w = pref.showPlaylistFulldate ? w - scaleForDisplay(320) : w - scaleForDisplay(240);
 		this.link_dimensions = this.updateDimensions();
 		this.w = Math.ceil(Math.min(this.container_w, this.link_dimensions.Width + 1));
 	}
@@ -115,29 +115,33 @@ class Hyperlink {
 	click() {
 		const populatePlaylist = function (query) {
 			debugLog(query);
-			const handle_list = fb.GetQueryItems(fb.GetLibraryItems(), query);
-			if (handle_list.Count) {
-				const pl = plman.FindOrCreatePlaylist('Search', true);
-				handle_list.Sort();
-				const index = fb.IsPlaying ? handle_list.BSearch(fb.GetNowPlaying()) : -1;
-				if (pl === plman.PlayingPlaylist && plman.GetPlayingItemLocation().PlaylistIndex === pl && index !== -1) {
-					// remove everything in playlist except currently playing song
-					plman.ClearPlaylistSelection(pl);
-					plman.SetPlaylistSelection(pl, [plman.GetPlayingItemLocation().PlaylistItemIndex], true);
-					plman.RemovePlaylistSelection(pl, true);
-					plman.ClearPlaylistSelection(pl);
+			try {
+				const handle_list = fb.GetQueryItems(fb.GetLibraryItems(), query);
+				if (handle_list.Count) {
+					const pl = plman.FindOrCreatePlaylist('Search', true);
+					handle_list.Sort();
+					const index = fb.IsPlaying ? handle_list.BSearch(fb.GetNowPlaying()) : -1;
+					if (pl === plman.PlayingPlaylist && plman.GetPlayingItemLocation().PlaylistIndex === pl && index !== -1) {
+						// remove everything in playlist except currently playing song
+						plman.ClearPlaylistSelection(pl);
+						plman.SetPlaylistSelection(pl, [plman.GetPlayingItemLocation().PlaylistItemIndex], true);
+						plman.RemovePlaylistSelection(pl, true);
+						plman.ClearPlaylistSelection(pl);
 
-					handle_list.RemoveById(index);
-				} else {
-					// nothing playing or Search playlist is not active
-					plman.ClearPlaylist(pl);
+						handle_list.RemoveById(index);
+					} else {
+						// nothing playing or Search playlist is not active
+						plman.ClearPlaylist(pl);
+					}
+					plman.InsertPlaylistItems(pl, 0, handle_list);
+					plman.SortByFormat(pl, settings.defaultSortString);
+					plman.ActivePlaylist = pl;
+					return true;
 				}
-				plman.InsertPlaylistItems(pl, 0, handle_list);
-				plman.SortByFormat(pl, settings.defaultSortString);
-				plman.ActivePlaylist = pl;
-				return true;
+				return false;
+			} catch (e) {
+				console.log(`Could not succesfully execute: ${query}`);
 			}
-			return false;
 		}
 		/** @type {string} */
 		let query;
@@ -153,10 +157,10 @@ class Hyperlink {
 				}
 				break;
 			case 'artist':
-				query = `Artist HAS ${this.text} OR ARTISTFILTER HAS ${this.text}`;
+				query = `Artist HAS "${this.text.replace(/"/g,'')}" OR ARTISTFILTER HAS "${this.text.replace(/"/g,'')}"`;
 				break;
 			default:
-				query = this.type + ' IS ' + this.text;
+				query = `${this.type} IS "${this.text}"`;
 				break;
 		}
 
